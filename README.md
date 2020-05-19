@@ -75,5 +75,3 @@ clustered by hierarchical clustering using the generated matrix.
 
 The distributions of the global values for the enriched events are finally plotted, which enables the inference of probable 
 temporal ordering of the events. 
-
-# Description of the output
