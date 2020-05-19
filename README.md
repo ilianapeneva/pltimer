@@ -22,7 +22,7 @@ pltimer requires only the file with the hg19 build chromosome coordinates.
 pltimer takes as an input the subclones information output from Battenberg. In order to be able to include the driver mutations
 information in the timing model, it needs to be converted in certain format, with the columns being 
 
-** Tumour_Name chr startpos endpos nMaj1_A nMin1_A tumour_ploidy CNA noevent w.mean no.chrs.bearing.mut **
+**Tumour_Name chr startpos endpos nMaj1_A nMin1_A tumour_ploidy CNA noevent w.mean no.chrs.bearing.mut**
 
 To get the copy number information (nMaj1_A and nMin1_A) and the multiplicity of the mutation (no.chrs.bearing.mut), 
 the preprocessing step of DPClust needs to be run. 
