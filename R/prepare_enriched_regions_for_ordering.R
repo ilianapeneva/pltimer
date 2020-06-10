@@ -4,13 +4,13 @@
 #' @param tumour_type String that represents the type of tumour we work with
 #' @param output_dir Full path to the directory where the files with the enriched regions (and the p-values) will be output
 #' @param pvalues_dir Full path to the directory with the FDR-corrected p-values and the enriched regions
-#' @param hg19_chr_coordinates Full path to the file with the chromosome coordinates of the hg19 build genome
+#' @param genome_chr_coordinates Full path to the file with the chromosome coordinates of the hg19 or hg38 build genome
 #' @param min_region A numeric representing the minimum length of enriched region; default = 1e4
 #' @param minN A numeric representing the minimum number of events per segment to be used; default = 3
 #' @return files with enriched regions (separate files for LOH, HD and gain), with any artefacts removed
 
 
-remove_artefacts <- function(annotated_segments_file, tumour_type, output_dir, pvalues_dir, hg19_chr_coordinates, min_region=10000, minN=3){
+remove_artefacts <- function(annotated_segments_file, tumour_type, output_dir, pvalues_dir, genome_chr_coordinates, min_region=10000, minN=3){
 
   # LOOP TO GENERATE OUTPUT FOR ALL THREE CNA TYPES
   # load the all segments data
@@ -67,8 +67,8 @@ remove_artefacts <- function(annotated_segments_file, tumour_type, output_dir, p
       enriched_data = data.frame()      # create enriched_data data frame where we are going to merge the FDR-enriched regions in each chr
       chrs = unique(all.sig.data$chr)   # all the chromosomes having enriched regions
 
-      # load the chromosome coordinates for hg19
-      chr_loc = read.table(hg19_chr_coordinates, header = T, stringsAsFactors = F)
+      # load the chromosome coordinates for hg19 or hg38
+      chr_loc = read.table(genome_chr_coordinates, header = T, stringsAsFactors = F)
 
 
       for (i in 1:length(chrs)){
@@ -179,11 +179,11 @@ remove_artefacts <- function(annotated_segments_file, tumour_type, output_dir, p
 #' @param tumour_type String that represents the type of tumour we work with
 #' @param enriched_dir Full path to the directory with the files with the enriched regions
 #' @param output_dir Full path to the directory where the merged enriched segments and the plots of the enriched regions are output
-#' @param hg19_chr_coordinates Full path to the file with the chromosome coordinates of the hg19 build genome
+#' @param genome_chr_coordinates Full path to the file with the chromosome coordinates of the hg19 or hg38 build genome
 #' @return files with merged enriched regions (separate files for LOH, HD and gain) and plots of the segments overlapping the enriched regions
 
 
-merge_enriched_regions <- function(annotated_segments_file, tumour_type, enriched_dir, hg19_chr_coordinates, output_dir){
+merge_enriched_regions <- function(annotated_segments_file, tumour_type, enriched_dir, genome_chr_coordinates, output_dir){
 
   cna_type = c("Gain","LOH","HD")
   allsegments <- read.table(annotated_segments_file, sep = "\t", stringsAsFactors = F, header = T) # load the allsegments file
@@ -232,8 +232,8 @@ merge_enriched_regions <- function(annotated_segments_file, tumour_type, enriche
       # all chromosomes that have enriched regions
       chrs = unique(merged$chr)
 
-      # load the chromosome coordinates for hg19
-      chr_loc = read.table(hg19_chr_coordinates, header = T, stringsAsFactors = F)
+      # load the chromosome coordinates for hg19 or hg38
+      chr_loc = read.table(genome_chr_coordinates, header = T, stringsAsFactors = F)
 
       for (k in 1:length(chrs)){
         chr_enriched_regions = merged[which(merged$chr==chrs[k]),]   # plot the segments in the enriched regions
@@ -335,10 +335,10 @@ multipcf_new_breakpoints <- function(enriched_dir, tumour_type, output_dir){
 #' @param annotated_segments_file Full path to the file with the annotated CNA
 #' @param tumour_type String that represents the type of tumour we work with
 #' @param enriched_dir Full path the directory with the enriched regions
-#' @param hg19_chr_coordinates Full path to the file with the chromosome coordinates of the hg19 build genome
+#' @param genome_chr_coordinates Full path to the file with the chromosome coordinates of the hg19 or hg38 build genome
 #' @param output_dir Full path to the directory where the files with the enriched regions will be output
 #' @return files with enriched regions (separate files for LOH, HD and gain) in the format for the ordering script
-prepare_ordering_data <- function(annotated_segments_file, tumour_type, enriched_dir, hg19_chr_coordinates, output_dir){
+prepare_ordering_data <- function(annotated_segments_file, tumour_type, enriched_dir, genome_chr_coordinates, output_dir){
   # load the allsegments data
   allsegments <- read.table(annotated_segments_file, sep = "\t", stringsAsFactors = F, header = T)
   cna_type    <- c("LOH", "Gain", "HD")
@@ -387,8 +387,8 @@ prepare_ordering_data <- function(annotated_segments_file, tumour_type, enriched
 
       # plot the segments in each enriched region for all chromosomes
       chrs = unique(merged$chr)
-      # load the chromosome coordinates for hg19
-      chr_loc = read.table(hg19_chr_coordinates, header = T,stringsAsFactors = F)
+      # load the chromosome coordinates for hg19 or hg38
+      chr_loc = read.table(genome_chr_coordinates, header = T,stringsAsFactors = F)
 
       for (i in 1:length(chrs)){
         chr_enriched_regions=merged[which(merged$chr==chrs[i]),]

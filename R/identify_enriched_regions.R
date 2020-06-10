@@ -6,11 +6,12 @@
 #' @param loh_output_dir Full path to the directory where the simulations of the losses of heterozygosity will be saved
 #' @param hd_output_dir Full path to the directoey where the simulations of the homozygous deletions will be saved
 #' @param tumour_type String that represents the type of tumour we work with
+#' @param genome_build String that represents the genome build - could be hg19 or hg38
 #' @param run Number of simulation
 #' @return files with the random placing of the LOH/gain/HD events
 
 
-identify_enriched_regions <- function(annotated_segments_file, refsegs_dir, gain_output_dir, loh_output_dir, hd_output_dir, tumour_type, run){
+identify_enriched_regions <- function(annotated_segments_file, refsegs_dir, gain_output_dir, loh_output_dir, hd_output_dir, tumour_type,genome_build, run){
 
   # GAIN ####
   # load the annotated segments data
@@ -31,7 +32,15 @@ identify_enriched_regions <- function(annotated_segments_file, refsegs_dir, gain
     chr.seg.counts[chr] = nrow(chr.data[[chr]])
   }
   cum.chr.seg.counts = c(0,cumsum(chr.seg.counts))   # sort out genome and chr info in relation with the length of the chromosome and genome
-  chr.lengths <- c(248956422,242193529,198295559,190214555,181538259,170805979,159345973,145138636,138394717,133797422,135086622,133275309,114364328,107043718,101991189,90338345,83257441,80373285,58617616,64444167,46709983,50818468,156040895)
+  
+ if (genome_build=='hg19'){
+   chr.lengths <- seqlengths(BSgenome.Hsapiens.UCSC.hg19)[1:23]
+ } else if (genome_build=='hg38'){
+   chr.lengths <- seqlengths(BSgenome.Hsapiens.UCSC.hg38)[1:23]
+ } else {
+  print('genome build should be hg19 or hg38')
+ }
+  #chr.lengths <- c(248956422,242193529,198295559,190214555,181538259,170805979,159345973,145138636,138394717,133797422,135086622,133275309,114364328,107043718,101991189,90338345,83257441,80373285,58617616,64444167,46709983,50818468,156040895)
   genome.length = sum(as.numeric(chr.lengths))
   half.genome.length = round(genome.length/2)
   chr.boundaries = c(0,cumsum(as.numeric(chr.lengths)))
@@ -121,7 +130,7 @@ identify_enriched_regions <- function(annotated_segments_file, refsegs_dir, gain
     chr.seg.counts[chr] = nrow(chr.data[[chr]])
   }
   cum.chr.seg.counts = c(0,cumsum(chr.seg.counts))   # sort out some genome and chr info
-  chr.lengths<-c(248956422,242193529,198295559,190214555,181538259,170805979,159345973,145138636,138394717,133797422,135086622,133275309,114364328,107043718,101991189,90338345,83257441,80373285,58617616,64444167,46709983,50818468,156040895)
+  #chr.lengths<-c(248956422,242193529,198295559,190214555,181538259,170805979,159345973,145138636,138394717,133797422,135086622,133275309,114364328,107043718,101991189,90338345,83257441,80373285,58617616,64444167,46709983,50818468,156040895)
   genome.length = sum(as.numeric(chr.lengths))
   half.genome.length = round(genome.length/2)
   chr.boundaries = c(0,cumsum(as.numeric(chr.lengths)))
@@ -211,7 +220,7 @@ identify_enriched_regions <- function(annotated_segments_file, refsegs_dir, gain
     chr.seg.counts[chr] = nrow(chr.data[[chr]])
   }
   cum.chr.seg.counts = c(0,cumsum(chr.seg.counts))   # sort out some genome and chr info
-  chr.lengths < -c(248956422,242193529,198295559,190214555,181538259,170805979,159345973,145138636,138394717,133797422,135086622,133275309,114364328,107043718,101991189,90338345,83257441,80373285,58617616,64444167,46709983,50818468,156040895)
+  #chr.lengths < -c(248956422,242193529,198295559,190214555,181538259,170805979,159345973,145138636,138394717,133797422,135086622,133275309,114364328,107043718,101991189,90338345,83257441,80373285,58617616,64444167,46709983,50818468,156040895)
   genome.length = sum(as.numeric(chr.lengths))
   half.genome.length = round(genome.length/2)
   chr.boundaries = c(0,cumsum(as.numeric(chr.lengths)))

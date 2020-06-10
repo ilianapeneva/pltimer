@@ -178,16 +178,24 @@ CNA_annotation <- function(allsegs_file, tumour_type, output_dir){
 #'
 #' @param annotated_segments_file Full path to the file with the aggregated subclones information, which has been annotated with the CNA type
 #' @param tumour_type String that represents the type of tumour we work with
+#' @param genome_build String that represents the genome build (could be hg19 or hg38)
 #' @param output_dir Full path to the directory with the refsegs files output from this function
 #' @return files with information about which positions of the genome are aberrated across the whole cohort. There will be a separate file for all/clonal/subclonal LOH/gain/HD.
 
-prepare_data_for_landscape <- function(annotated_segments_file, tumour_type, output_dir){
-  # get the lengths of the genome
-  hg19_genome = BSgenome.Hsapiens.UCSC.hg19
-  chr_lengths = seqlengths(hg19_genome)
+prepare_data_for_landscape <- function(annotated_segments_file, tumour_type, genome_build, output_dir){
+   if (genome_build=='hg19'){
+  hg_genome = BSgenome.Hsapiens.UCSC.hg19
+  chr_lengths = seqlengths(hg_genome)
   chr_df = data.frame(chr = as.numeric(1:23),length = as.numeric(chr_lengths[1:23])) # Chromosome lengths with the corresponding chr
   maxchr = chr_df$length
-
+ } else if (genome_build=='hg38'){
+  hg_genome = BSgenome.Hsapiens.UCSC.hg38
+  chr_lengths = seqlengths(hg_genome)
+  chr_df = data.frame(chr = as.numeric(1:23),length = as.numeric(chr_lengths[1:23])) # Chromosome lengths with the corresponding chr
+  maxchr = chr_df$length
+ } else {
+  print('Genome build should be hg19 or hg38')
+ }
 
   # the CNAs we're interested to collect data for the landscape plot
   CNAs <- c("LOH","HD", "Gain","cLOH","cHD", "cGain","sLOH","sHD", "sGain")
@@ -248,20 +256,30 @@ prepare_data_for_landscape <- function(annotated_segments_file, tumour_type, out
 #' @param annotated_segments_file Full path to the aggregated subclones file, which has been annotated with the CNA type
 #' @param refsegs_dir Full path to the directory with the refsegs files
 #' @param tumour_type String that represents the type of tumour we work with
+#' @param genome_build String that represents the genome build (could be hg19 or hg38)
 #' @param output_dir Full path to the directory where the landscape plots will be saved
 #' @return a pdf file with the overall landscape of all/clonal/subclonal events
 
-plot_CN_landscape <- function(annotated_segments_file, refsegs_dir,  tumour_type, output_dir){
+plot_CN_landscape <- function(annotated_segments_file, refsegs_dir,  tumour_type, genome_build, output_dir){
   copy.number.data <- read.table(annotated_segments_file, header = T, stringsAsFactors = F)
   copy.number.data <- copy.number.data[copy.number.data$frac1_A>0 & copy.number.data$frac1_A<=1 & copy.number.data$tumour_ploidy>0,]
   samples = unique(copy.number.data$Tumour_Name) # number of samples in the cohort
-
-  hg19_genome = BSgenome.Hsapiens.UCSC.hg19
-  chr_lengths = seqlengths(hg19_genome)
+  
+  
+ if (genome_build=='hg19'){
+  hg_genome = BSgenome.Hsapiens.UCSC.hg19
+  chr_lengths = seqlengths(hg_genome)
   chr_df = data.frame(chr = as.numeric(1:23),length = as.numeric(chr_lengths[1:23])) # Chromosome lengths with the corresponding chr
   maxchr = chr_df$length
-
-
+ } else if (genome_build=='hg38'){
+  hg_genome = BSgenome.Hsapiens.UCSC.hg38
+  chr_lengths = seqlengths(hg_genome)
+  chr_df = data.frame(chr = as.numeric(1:23),length = as.numeric(chr_lengths[1:23])) # Chromosome lengths with the corresponding chr
+  maxchr = chr_df$length
+ } else {
+  print('Genome build should be hg19 or hg38')
+ }
+ 
   # get the end positions for the chromosomes on the whole genome (i.e chr1 endpos1, chr2 endpos2=(endpos1+length of chr 2)...)
   loci <- 0
   for (i in 1:23) {
